@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your view_sets here.
+def home(request):
+    return render(request, 'index.html')

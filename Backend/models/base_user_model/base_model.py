@@ -1,4 +1,5 @@
-from Backend.validators.base_user_validators.base_user_validators import (validate_email)
+from Backend.validators.base_user_validators.base_user_validators import (validate_email, username_validator,
+                                                                          username_length_validator, validate_username)
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 
@@ -37,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeManager):
     ]
 
     email = models.EmailField(unique=True, validators=[validate_email])
-    username = models.CharField(max_length=30, unique=True, validators=[...])
+    username = models.CharField(max_length=30,unique=True,validators=[username_validator, username_length_validator, validate_username])
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(blank=True, max_length=500)
 
