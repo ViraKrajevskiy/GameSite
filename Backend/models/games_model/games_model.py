@@ -10,11 +10,11 @@ class Games(TimeManager):
     platforms = models.ManyToManyField('Platform', through='GamePlatformRelease', related_name='games')
 
     def __str__(self):
-        return f'{self.title}, {self.created_at}'
+        return f'{self.title}, {self.created_at}{self.rating}'
 
 
 class Platform(TimeManager):
-    title = models.CharField(max_length=100)      # Steam, itch.io, GOG...
+    title = models.CharField(max_length=100)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
 
     def __str__(self):
