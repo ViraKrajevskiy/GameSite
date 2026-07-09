@@ -10,7 +10,7 @@ class Games(TimeManager):
     platforms = models.ManyToManyField('Platform', through='GamePlatformRelease', related_name='games')
 
     def __str__(self):
-        return f'{self.title}, {self.created_at}{self.rating}'
+        return f'{self.title}, {self.created_at}'
 
 
 class Platform(TimeManager):
