@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru" data-mode="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAMESITE — HARDCORE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  html[data-mode="light"]{ --c-bg:#ffffff; --c-bg-2:#fff6f6; --c-fg:#0a0a0a; --hairline-inv:rgba(255,255,255,0.25); }
+  html[data-mode="dark"]{ --c-bg:#0a0a0a; --c-bg-2:#1a1010; --c-fg:#ffffff; --hairline-inv:rgba(0,0,0,0.28); }
+  :root{
+    --red:#ff1a1a;
+    --yellow:#ffe600;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--c-bg);
+    color:var(--c-fg);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+  h1,h2,h3{
+    font-family:'Archivo Black', sans-serif;
+    text-transform:uppercase;
+    line-height:0.92;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important;}
+  }
+  :focus-visible{outline:4px solid var(--red);outline-offset:2px;}
+
+  .hazard{
+    background-image:repeating-linear-gradient(-45deg, var(--yellow) 0 18px, #0a0a0a 18px 36px);
+    height:14px;
+  }
+
+  /* ---------- NAV ---------- */
+  .bar{
+    border-bottom:5px solid var(--c-fg);
+    background:var(--c-bg);
+    position:sticky;top:0;z-index:50;
+    transition:background-color .25s ease, border-color .25s ease;
+  }
+  .bar .wrap{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;flex-wrap:wrap;gap:12px;}
+  .logo{font-family:'Archivo Black', sans-serif;font-size:24px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+  .logo .sq{width:14px;height:14px;background:var(--red);display:inline-block;}
+  nav{display:flex;gap:0;}
+  nav a{
+    font-family:'JetBrains Mono', monospace;font-weight:700;font-size:12.5px;text-transform:uppercase;
+    letter-spacing:0.04em;padding:10px 18px;border-left:2px solid var(--c-fg);
+    transition:background .12s ease, color .12s ease;
+  }
+  nav a:hover{background:var(--c-fg);color:var(--c-bg);}
+
+  .toolbar{display:flex;align-items:center;gap:10px;}
+  .switch-group{display:flex;border:2px solid var(--c-fg);}
+  .switch-group button{
+    font-family:'JetBrains Mono', monospace;font-weight:800;font-size:11.5px;text-transform:uppercase;
+    background:var(--c-bg);color:var(--c-fg);border:none;padding:9px 12px;cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .switch-group button + button{border-left:2px solid var(--c-fg);}
+  .switch-group button.active{background:var(--c-fg);color:var(--c-bg);}
+  .btn-login{
+    font-family:'JetBrains Mono', monospace;font-weight:800;font-size:12.5px;text-transform:uppercase;
+    background:var(--c-fg);color:var(--c-bg);padding:11px 18px;border:2px solid var(--c-fg);
+    box-shadow:4px 4px 0 var(--red);transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-login:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--red);}
+  .btn-login:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--red);}
+
+  /* ---------- HERO ---------- */
+  .hero{border-bottom:5px solid var(--c-fg);}
+  .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;}
+  .hero-copy{padding:64px 44px 64px 24px;border-right:5px solid var(--c-fg);}
+  .stamp-warn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'JetBrains Mono', monospace;font-weight:800;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    background:var(--yellow);color:#0a0a0a;border:2px solid var(--c-fg);padding:6px 12px;margin-bottom:24px;
+  }
+  .hero-copy h1{font-size:clamp(46px,6.2vw,88px);margin-bottom:24px;}
+  .hero-copy h1 .red{color:var(--red);}
+  .hero-deck{max-width:48ch;font-size:17px;line-height:1.6;font-weight:500;margin-bottom:30px;}
+  .cta-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:36px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:'JetBrains Mono', monospace;font-weight:800;font-size:13.5px;letter-spacing:0.03em;text-transform:uppercase;
+    padding:16px 26px;border:3px solid var(--c-fg);cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .btn-primary{background:var(--red);color:#fff;box-shadow:6px 6px 0 var(--c-fg);}
+  .btn-primary:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--c-fg);}
+  .btn-primary:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--c-fg);}
+  .btn-outline{background:var(--c-bg);color:var(--c-fg);box-shadow:6px 6px 0 var(--yellow);}
+  .btn-outline:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--yellow);}
+  .btn-outline:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--yellow);}
+
+  .stat-strip{display:flex;border-top:3px solid var(--c-fg);flex-wrap:wrap;}
+  .stat-strip div{padding:14px 20px 0 0;margin-right:20px;}
+  .stat-strip .num{font-family:'Archivo Black',sans-serif;font-size:28px;}
+  .stat-strip .lab{font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;opacity:0.65;}
+
+  .hero-art{position:relative;background:var(--c-fg);display:flex;align-items:flex-end;padding:26px;overflow:hidden;transition:background-color .25s ease;}
+  .hero-art::before{
+    content:"";position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,26,26,0.12) 0 3px, transparent 3px 46px),
+      repeating-linear-gradient(0deg, rgba(255,230,0,0.08) 0 3px, transparent 3px 46px);
+  }
+  .hero-art .cover-name{
+    position:relative;z-index:2;font-family:'Archivo Black', sans-serif;color:var(--c-bg);
+    font-size:clamp(30px,3.6vw,44px);text-transform:uppercase;line-height:0.95;
+  }
+  .warn-badge{
+    position:absolute;top:22px;right:22px;z-index:3;background:var(--yellow);color:#0a0a0a;
+    border:3px solid var(--c-bg);padding:10px 14px;transform:rotate(4deg);font-family:'JetBrains Mono', monospace;
+  }
+  .warn-badge .score{font-weight:800;font-size:24px;line-height:1;}
+  .warn-badge .lab{font-size:8.5px;letter-spacing:0.1em;text-transform:uppercase;}
+
+  /* ---------- TICKER ---------- */
+  .ticker{background:var(--c-fg);color:var(--c-bg);overflow:hidden;white-space:nowrap;border-bottom:5px solid var(--c-fg);transition:background-color .25s ease;}
+  .ticker-track{
+    display:inline-flex;gap:40px;padding:12px 0;animation:tick 22s linear infinite;
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:0.03em;
+  }
+  .ticker-track span{display:inline-flex;align-items:center;gap:10px;}
+  .ticker-track span::before{content:"■";color:var(--red);}
+  @keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:70px 0;}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px;gap:18px;flex-wrap:wrap;
+    border-bottom:5px solid var(--c-fg);padding-bottom:20px;
+  }
+  .section-head h2{font-size:clamp(28px,3.6vw,44px);}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
+    background:var(--yellow);color:#0a0a0a;display:inline-block;padding:4px 8px;margin-bottom:12px;border:2px solid var(--c-fg);
+  }
+  .see-all{
+    font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12.5px;text-transform:uppercase;
+    background:var(--c-fg);color:var(--c-bg);padding:10px 16px;box-shadow:4px 4px 0 var(--red);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .see-all:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--red);}
+
+  /* ---------- GAMES GRID ---------- */
+  .games-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:3px solid var(--c-fg);border-left:3px solid var(--c-fg);}
+  .game-card{
+    border-right:3px solid var(--c-fg);border-bottom:3px solid var(--c-fg);
+    display:flex;flex-direction:column;background:var(--c-bg);transition:background .15s ease;
+  }
+  .game-card:hover{background:var(--c-bg-2);}
+  .game-cover{position:relative;aspect-ratio:16/10;display:flex;align-items:flex-end;padding:16px;border-bottom:3px solid var(--c-fg);}
+  .gc-1{background:repeating-linear-gradient(135deg, #1a1a1a 0 14px, #0a0a0a 14px 28px);}
+  .gc-2{background:repeating-linear-gradient(135deg, #241010 0 14px, #0a0a0a 14px 28px);}
+  .gc-3{background:repeating-linear-gradient(135deg, #101f24 0 14px, #0a0a0a 14px 28px);}
+  .gc-4{background:repeating-linear-gradient(135deg, #1f1a08 0 14px, #0a0a0a 14px 28px);}
+  .gc-5{background:repeating-linear-gradient(135deg, #181010 0 14px, #0a0a0a 14px 28px);}
+  .gc-6{background:repeating-linear-gradient(135deg, #0f1c14 0 14px, #0a0a0a 14px 28px);}
+  .game-cover h3{font-family:'Archivo Black', sans-serif;font-size:21px;color:#f5f5f5;text-transform:uppercase;line-height:0.98;}
+  .score-chip{
+    position:absolute;top:12px;right:12px;background:var(--yellow);color:#0a0a0a;
+    border:2px solid #f5f5f5;padding:5px 9px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;transform:rotate(-3deg);
+  }
+  .game-body{padding:18px;flex:1;display:flex;flex-direction:column;gap:12px;}
+  .plat-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .plat-row span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10px;text-transform:uppercase;border:2px solid var(--c-fg);padding:3px 7px;}
+  .game-desc{font-size:13.5px;line-height:1.55;font-weight:500;}
+  .game-foot{
+    margin-top:auto;display:flex;justify-content:space-between;
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;text-transform:uppercase;
+    padding-top:10px;border-top:2px dashed var(--c-fg);
+  }
+
+  /* ---------- PLATFORMS ---------- */
+  .platforms{background:var(--c-fg);color:var(--c-bg);border-top:5px solid var(--c-fg);border-bottom:5px solid var(--c-fg);transition:background-color .25s ease;}
+  .platforms .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;padding:32px 24px;}
+  .platforms-label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;}
+  .plat-list{display:flex;gap:0;flex-wrap:wrap;}
+  .plat-list span{
+    font-family:'Archivo Black',sans-serif;font-size:17px;text-transform:uppercase;
+    padding:4px 16px;border-left:2px solid var(--hairline-inv);transition:color .15s ease;
+  }
+  .plat-list span:hover{color:var(--red);}
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:56px 0 26px;}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:0;border-top:5px solid var(--c-fg);border-bottom:3px solid var(--c-fg);}
+  .foot-grid > div{padding:32px 24px;border-right:3px solid var(--c-fg);}
+  .foot-grid > div:last-child{border-right:none;}
+  .foot-tag{font-size:13px;line-height:1.6;font-weight:500;max-width:30ch;margin-top:10px;}
+  .foot-col h4{
+    font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;margin:0 0 14px;
+    background:var(--yellow);color:#0a0a0a;display:inline-block;padding:3px 6px;border:2px solid var(--c-fg);
+  }
+  .foot-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:13.5px;font-weight:600;}
+  .foot-col a:hover{color:var(--red);}
+  .foot-bottom{
+    display:flex;justify-content:space-between;padding-top:18px;
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;text-transform:uppercase;flex-wrap:wrap;gap:8px;
+  }
+
+  @media (max-width:960px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-copy{border-right:none;border-bottom:5px solid var(--c-fg);}
+    .games-grid{grid-template-columns:repeat(2,1fr);}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:640px){
+    nav{display:none;}
+    .games-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr;}
+    .foot-grid > div{border-right:none;border-bottom:3px solid var(--c-fg);}
+  }
+</style>
+</head>
+<body>
+
+  <div class="hazard"></div>
+
+  <div class="bar">
+    <div class="wrap">
+      <a href="/" class="logo"><span class="sq"></span>GAMESITE</a>
+      <nav>
+        <a href="#games" data-i18n="nav_games">Игры</a>
+        <a href="#news" data-i18n="nav_news">Новости</a>
+        <a href="#vlogs" data-i18n="nav_vlogs">Влоги</a>
+        <a href="#platforms" data-i18n="nav_platforms">Платформы</a>
+      </nav>
+      <div class="toolbar">
+        <div class="switch-group" role="group" aria-label="Тема">
+          <button data-mode-btn="light">☀</button>
+          <button data-mode-btn="dark">☾</button>
+        </div>
+        <div class="switch-group" role="group" aria-label="Язык">
+          <button data-lang-btn="ru">RU</button>
+          <button data-lang-btn="en">EN</button>
+        </div>
+        <a href="/api/auth/login/" class="btn-login" data-i18n="signin">Войти</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="stamp-warn" data-i18n="hero_badge">⚠ Только жёсткие игры</span>
+        <h1 data-i18n-html="hero_title">Без<br>пощады.<br><span class="red">Только игры.</span></h1>
+        <p class="hero-deck" data-i18n="hero_deck">Каталог, оценки сообщества без цензуры, новости индустрии и видеообзоры. Никакой воды — только то, во что стоит играть.</p>
+        <div class="cta-row">
+          <a href="#games" class="btn btn-primary" data-i18n="cta_primary">Открыть каталог →</a>
+          <a href="#news" class="btn btn-outline" data-i18n="cta_ghost">Читать новости</a>
+        </div>
+        <div class="stat-strip">
+          <div><div class="num">340+</div><div class="lab" data-i18n="stat_1">игр в базе</div></div>
+          <div><div class="num">8.1</div><div class="lab" data-i18n="stat_2">средняя оценка</div></div>
+          <div><div class="num">24</div><div class="lab" data-i18n="stat_3">новости в неделю</div></div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="warn-badge"><div class="score">9.4</div><div class="lab" data-i18n="out_of_10">из 10</div></div>
+        <div class="cover-name">Ashfall<br>Chronicles</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span data-i18n="tick_1">Ashfall Chronicles — оценка 9.4</span>
+      <span data-i18n="tick_2">Ironclad Siege: трейлер собрал 2 млн просмотров</span>
+      <span data-i18n="tick_3">Hollow Circuit выходит в этом квартале</span>
+      <span data-i18n="tick_4">Топ-10 игр месяца уже на сайте</span>
+      <span data-i18n="tick_1">Ashfall Chronicles — оценка 9.4</span>
+      <span data-i18n="tick_2">Ironclad Siege: трейлер собрал 2 млн просмотров</span>
+      <span data-i18n="tick_3">Hollow Circuit выходит в этом квартале</span>
+      <span data-i18n="tick_4">Топ-10 игр месяца уже на сайте</span>
+    </div>
+  </div>
+
+  <section id="games">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" data-i18n="eyebrow_catalog">Каталог</p>
+          <h2 data-i18n="h2_catalog">Во что играть</h2>
+        </div>
+        <a href="#" class="see-all" data-i18n="see_all">Весь каталог →</a>
+      </div>
+
+      <div class="games-grid">
+        <article class="game-card">
+          <div class="game-cover gc-1"><span class="score-chip">9.4/10</span><h3>Ashfall<br>Chronicles</h3></div>
+          <div class="game-body">
+            <div class="plat-row"><span>PC</span><span>PlayStation</span><span>Xbox</span></div>
+            <p class="game-desc" data-i18n="desc_1">Постапокалиптическая RPG с открытым миром и выбором, меняющим судьбу фракций.</p>
+            <div class="game-foot"><span>RPG</span><span>2026</span></div>
+          </div>
+        </article>
+        <article class="game-card">
+          <div class="game-cover gc-2"><span class="score-chip">8.7/10</span><h3>Ironclad<br>Siege</h3></div>
+          <div class="game-body">
+            <div class="plat-row"><span>PC</span><span>Switch</span></div>
+            <p class="game-desc" data-i18n="desc_2">Тактическая стратегия про осаду крепостей с кооперативом на четверых.</p>
+            <div class="game-foot"><span>Strategy</span><span>2025</span></div>
+          </div>
+        </article>
+        <article class="game-card">
+          <div class="game-cover gc-3"><span class="score-chip">7.9/10</span><h3>Pixel<br>Reef</h3></div>
+          <div class="game-body">
+            <div class="plat-row"><span>PC</span><span>Mobile</span></div>
+            <p class="game-desc" data-i18n="desc_3">Медитативный симулятор рифа — выращивайте экосистему, открывайте виды.</p>
+            <div class="game-foot"><span>Simulation</span><span>2025</span></div>
+          </div>
+        </article>
+        <article class="game-card">
+          <div class="game-cover gc-4"><span class="score-chip">9.0/10</span><h3>Hollow<br>Circuit</h3></div>
+          <div class="game-body">
+            <div class="plat-row"><span>PC</span><span>PlayStation</span></div>
+            <p class="game-desc" data-i18n="desc_4">Киберпанк-детектив с ветвящимся сюжетом и полной озвучкой диалогов.</p>
+            <div class="game-foot"><span>Adventure</span><span>2026</span></div>
+          </div>
+        </article>
+        <article class="game-card">
+          <div class="game-cover gc-5"><span class="score-chip">8.3/10</span><h3>Starforge<br>Tactics</h3></div>
+          <div class="game-body">
+            <div class="plat-row"><span>PC</span><span>Xbox</span><span>Switch</span></div>
+            <p class="game-desc" data-i18n="desc_5">Пошаговая тактика в космосе с крафтом кораблей и полноценным PvP.</p>
+            <div class="game-foot"><span>Tactics</span><span>2024</span></div>
+          </div>
+        </article>
+        <article class="game-card">
+          <div class="game-cover gc-6"><span class="score-chip">8.9/10</span><h3>Neon<br>Drift</h3></div>
+          <div class="game-body">
+            <div class="plat-row"><span>PC</span><span>PlayStation</span></div>
+            <p class="game-desc" data-i18n="desc_6">Аркадные гонки по ночному городу под саундтрек независимых музыкантов.</p>
+            <div class="game-foot"><span>Racing</span><span>2025</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="platforms" id="platforms">
+    <div class="wrap">
+      <span class="platforms-label" data-i18n="platforms_label">Игры выходят на</span>
+      <div class="plat-list"><span>PC</span><span>PlayStation</span><span>Xbox</span><span>Switch</span><span>Mobile</span></div>
+    </div>
+  </div>
+
+  <footer id="news">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a href="/" class="logo"><span class="sq"></span>GAMESITE</a>
+          <p class="foot-tag" data-i18n="foot_tag">Каталог игр, честные оценки сообщества, новости и видео. Без компромиссов.</p>
+        </div>
+        <div>
+          <h4 data-i18n="foot_h_section">Раздел</h4>
+          <ul>
+            <li><a href="#games" data-i18n="foot_catalog">Каталог</a></li>
+            <li><a href="#news" data-i18n="nav_news">Новости</a></li>
+            <li><a href="#vlogs" data-i18n="nav_vlogs">Влоги</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot_h_community">Сообщество</h4>
+          <ul>
+            <li><a href="/api/auth/register/" data-i18n="foot_register">Регистрация</a></li>
+            <li><a href="/api/auth/login/" data-i18n="signin">Войти</a></li>
+            <li><a href="/api/docs/" data-i18n="foot_api">API</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot_h_social">Мы в сети</h4>
+          <ul><li><a href="#">Telegram</a></li><li><a href="#">YouTube</a></li><li><a href="#">VK</a></li></ul>
+        </div>
+      </div>
+      <div class="foot-bottom"><span>© 2026 GAMESITE</span><span data-i18n="foot_slogan">Без пощады. Только игры.</span></div>
+    </div>
+  </footer>
+
+<script>
+  const root = document.documentElement;
+
+  /* ---------- MODE (light/dark) ---------- */
+  const modeButtons = document.querySelectorAll('[data-mode-btn]');
+  function applyMode(mode){
+    root.setAttribute('data-mode', mode);
+    modeButtons.forEach(b => b.classList.toggle('active', b.dataset.modeBtn === mode));
+    try{ localStorage.setItem('gamesite-mode', mode); }catch(e){}
+  }
+  modeButtons.forEach(b => b.addEventListener('click', () => applyMode(b.dataset.modeBtn)));
+
+  /* ---------- LANGUAGE ---------- */
+  const I18N = {
+    ru: {
+      nav_games:"Игры", nav_news:"Новости", nav_vlogs:"Влоги", nav_platforms:"Платформы", signin:"Войти",
+      hero_badge:"⚠ Только жёсткие игры",
+      hero_title:'Без<br>пощады.<br><span class="red">Только игры.</span>',
+      hero_deck:"Каталог, оценки сообщества без цензуры, новости индустрии и видеообзоры. Никакой воды — только то, во что стоит играть.",
+      cta_primary:"Открыть каталог →", cta_ghost:"Читать новости",
+      stat_1:"игр в базе", stat_2:"средняя оценка", stat_3:"новости в неделю", out_of_10:"из 10",
+      tick_1:"Ashfall Chronicles — оценка 9.4", tick_2:"Ironclad Siege: трейлер собрал 2 млн просмотров",
+      tick_3:"Hollow Circuit выходит в этом квартале", tick_4:"Топ-10 игр месяца уже на сайте",
+      eyebrow_catalog:"Каталог", h2_catalog:"Во что играть", see_all:"Весь каталог →",
+      desc_1:"Постапокалиптическая RPG с открытым миром и выбором, меняющим судьбу фракций.",
+      desc_2:"Тактическая стратегия про осаду крепостей с кооперативом на четверых.",
+      desc_3:"Медитативный симулятор рифа — выращивайте экосистему, открывайте виды.",
+      desc_4:"Киберпанк-детектив с ветвящимся сюжетом и полной озвучкой диалогов.",
+      desc_5:"Пошаговая тактика в космосе с крафтом кораблей и полноценным PvP.",
+      desc_6:"Аркадные гонки по ночному городу под саундтрек независимых музыкантов.",
+      platforms_label:"Игры выходят на",
+      foot_tag:"Каталог игр, честные оценки сообщества, новости и видео. Без компромиссов.",
+      foot_h_section:"Раздел", foot_h_community:"Сообщество", foot_h_social:"Мы в сети",
+      foot_catalog:"Каталог", foot_register:"Регистрация", foot_api:"API",
+      foot_slogan:"Без пощады. Только игры."
+    },
+    en: {
+      nav_games:"Games", nav_news:"News", nav_vlogs:"Vlogs", nav_platforms:"Platforms", signin:"Sign in",
+      hero_badge:"⚠ Hardcore games only",
+      hero_title:'No<br>mercy.<br><span class="red">Just games.</span>',
+      hero_deck:"Catalog, uncensored community ratings, industry news and video reviews. No filler — only what's worth playing.",
+      cta_primary:"Open catalog →", cta_ghost:"Read the news",
+      stat_1:"games in the base", stat_2:"average rating", stat_3:"news items / week", out_of_10:"out of 10",
+      tick_1:"Ashfall Chronicles — rated 9.4", tick_2:"Ironclad Siege trailer hits 2M views",
+      tick_3:"Hollow Circuit ships this quarter", tick_4:"Top 10 games of the month is up",
+      eyebrow_catalog:"Catalog", h2_catalog:"What to play", see_all:"Full catalog →",
+      desc_1:"A post-apocalyptic open-world RPG where your choices decide the fate of entire factions.",
+      desc_2:"A tactical siege-warfare strategy with four-player co-op.",
+      desc_3:"A meditative reef simulator — grow the ecosystem and discover new species.",
+      desc_4:"A cyberpunk detective story with branching plot and full voice acting.",
+      desc_5:"Turn-based tactics in open space with ship crafting and full PvP.",
+      desc_6:"Arcade night-city racing with a soundtrack from independent electronic artists.",
+      platforms_label:"Games available on",
+      foot_tag:"Game catalog, honest community ratings, news and video. No compromises.",
+      foot_h_section:"Section", foot_h_community:"Community", foot_h_social:"Follow us",
+      foot_catalog:"Catalog", foot_register:"Sign up", foot_api:"API",
+      foot_slogan:"No mercy. Just games."
+    }
+  };
+
+  const langButtons = document.querySelectorAll('[data-lang-btn]');
+  function applyLang(lang){
+    root.setAttribute('lang', lang);
+    const dict = I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if(dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.dataset.i18nHtml;
+      if(dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    langButtons.forEach(b => b.classList.toggle('active', b.dataset.langBtn === lang));
+    try{ localStorage.setItem('gamesite-lang', lang); }catch(e){}
+  }
+  langButtons.forEach(b => b.addEventListener('click', () => applyLang(b.dataset.langBtn)));
+
+  /* ---------- INIT ---------- */
+  let savedMode = 'light', savedLang = 'ru';
+  try{
+    savedMode = localStorage.getItem('gamesite-mode') || 'light';
+    savedLang = localStorage.getItem('gamesite-lang') || 'ru';
+  }catch(e){}
+  applyMode(savedMode);
+  applyLang(savedLang);
+</script>
+
+</body>
+</html>

@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from Backend.models.comments_model.news_coment import NewsComment
 
-
 class NewsCommentSerializer(serializers.ModelSerializer):
     comment_writer = serializers.StringRelatedField(read_only=True)
 
