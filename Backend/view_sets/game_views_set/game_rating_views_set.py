@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+﻿from rest_framework import viewsets
 from Backend.models.games_model.game_rating_models import GamesRating
 from Backend.serializers.games_serializers.game_rations_serializers import GamesRatingSerializer
 from Backend.permissions.user_permissions.user_permission import RatingPermission

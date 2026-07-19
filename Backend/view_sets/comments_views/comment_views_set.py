@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+﻿from rest_framework import viewsets
 from Backend.models.comments_model.news_coment import NewsComment
 from Backend.models.comments_model.vlogs_coment import VlogsComment
 from Backend.serializers.comments_serializers.news_comments_serializers import NewsCommentSerializer
@@ -10,7 +10,7 @@ class NewsCommentViewSet(viewsets.ModelViewSet):
     queryset = NewsComment.objects.all()
     serializer_class = NewsCommentSerializer
     permission_classes = [CommentPermission]
-    # PUT/PATCH из API вообще не даём делать никому, кроме бана (удаления) модератором
+    # PUT/PATCH РёР· API РІРѕРѕР±С‰Рµ РЅРµ РґР°С‘Рј РґРµР»Р°С‚СЊ РЅРёРєРѕРјСѓ, РєСЂРѕРјРµ Р±Р°РЅР° (СѓРґР°Р»РµРЅРёСЏ) РјРѕРґРµСЂР°С‚РѕСЂРѕРј
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
 
 
