@@ -9,6 +9,8 @@ from Backend.view_sets.news_views.news_views_set import NewsViewSet
 from Backend.views import home
 from Backend.view_sets.game_views_set.games_views_set import GamesViewSet
 from Backend.view_sets.vlog_views.vlog_views_set import VlogsViewSet
+from Backend.view_sets.resume_views.resume_views_set import ResumeView
+from Backend.view_sets.home_views.home_views_set import HomeHeroView
 
 router = DefaultRouter()
 router.register(r'news-comments', NewsCommentViewSet, basename='news-comments')
@@ -28,6 +30,9 @@ urlpatterns = [
     path('api/auth/login/', LoginView.as_view(), name='login'),
     path('api/auth/login/refresh/', RefreshTokenView.as_view(), name='login-refresh'),
     path('api/auth/me/', MeView.as_view(), name='me'),
+
+    path('api/hero/', HomeHeroView.as_view(), name='home-hero'),
+    path('api/resume/', ResumeView.as_view(), name='resume'),
 
     path('api/', include(router.urls)),
 

@@ -6,10 +6,18 @@ from Backend.models.games_model.game_rating_models import GamesRating
 from Backend.models.news_model.news_model import News
 from Backend.models.comments_model.games_comment import GamesComment
 from Backend.models.vlogs_model.vlogs_model import Vlogs
+from Backend.models.home_model.home_model import HomeHero, HeroStat
+from Backend.models.resume_model.resume_model import (
+    Resume, ResumeContact, ResumeFact, ResumeSkillGroup, ResumeExperience,
+    ResumeProject, ResumeProjectLink, ResumeEducation, ResumeLanguage,
+)
 
 __all__ = [
     'User', 'TimeManager',
     'NewsComment', 'VlogsComment',
     'Games', 'GamePlatformRelease', 'Platform','GamesRating','GamesComment',
     'News', 'Vlogs',
+    'HomeHero', 'HeroStat',
+    'Resume', 'ResumeContact', 'ResumeFact', 'ResumeSkillGroup', 'ResumeExperience',
+    'ResumeProject', 'ResumeProjectLink', 'ResumeEducation', 'ResumeLanguage',
 ]
