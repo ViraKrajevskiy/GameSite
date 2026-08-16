@@ -2,12 +2,19 @@
 from rest_framework import viewsets
 from Backend.models.games_model.games_model import Games
 from Backend.serializers.games_serializers.games_serializer import GamesSerializer
-from Backend.permissions.moderator_permissions.moderator_permission import ReadOnlyForEveryone
+from Backend.permissions.content_permissions.content_permission import ContentPermission
 
 
-class GamesViewSet(viewsets.ReadOnlyModelViewSet):
+class GamesViewSet(viewsets.ModelViewSet):
+    """
+    Каталог игр. Раньше был ReadOnlyModelViewSet — добавить игру через API
+    не мог никто, включая суперюзера. Теперь чтение доступно всем, а запись —
+    создателю контента и админу (ContentPermission).
+
+    Автора у Games нет: это общий каталог, а не личные публикации.
+    """
     serializer_class = GamesSerializer
-    permission_classes = [ReadOnlyForEveryone]
+    permission_classes = [ContentPermission]
 
     def get_serializer_context(self):
         # нужен request, чтобы отдавать абсолютные ссылки на картинки платформ

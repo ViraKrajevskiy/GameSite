@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
 from Backend.models.games_model.games_model import Games
+from Backend.validators.file_validators.file_validators import validate_image_file
 
 
 class GamePlatformSerializer(serializers.Serializer):
@@ -28,6 +29,8 @@ class GamesSerializer(serializers.ModelSerializer):
     platforms = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     ratings_count = serializers.SerializerMethodField()
+    # Обложка: только картинка до 5 МБ
+    image = serializers.ImageField(required=False, validators=[validate_image_file])
 
     class Meta:
         model = Games
@@ -35,6 +38,13 @@ class GamesSerializer(serializers.ModelSerializer):
             'id', 'title', 'kind', 'kind_display', 'description', 'image', 'url',
             'platforms', 'average_rating', 'ratings_count', 'created_at',
         ]
+        read_only_fields = ['id', 'created_at']
+        extra_kwargs = {
+            # Игра без обложки — рабочий случай. Пока image был обязательным,
+            # создать игру можно было только multipart-запросом с файлом.
+            'image': {'required': False},
+            'url': {'required': False},
+        }
 
     @extend_schema_field(GamePlatformSerializer(many=True))
     def get_platforms(self, obj):

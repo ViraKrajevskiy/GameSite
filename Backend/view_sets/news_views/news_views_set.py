@@ -1,11 +1,32 @@
-﻿from rest_framework import viewsets
+from django.db.models import Q
+from rest_framework import viewsets
+
 from Backend.models.news_model.news_model import News
-from Backend.permissions.moderator_permissions.moderator_permission import ReadOnlyForEveryone
+from Backend.permissions.content_permissions.content_permission import ContentPermission
 from Backend.serializers.news_serializers.news_serializers import NewsSerializer
 
-class NewsViewSet(viewsets.ReadOnlyModelViewSet):
+
+class NewsViewSet(viewsets.ModelViewSet):
+    """
+    Раньше был ReadOnlyModelViewSet — создать новость через API было нельзя
+    в принципе, только через админку. Теперь создатель контента и админ
+    работают через API, остальные по-прежнему только читают (ContentPermission).
+    """
     serializer_class = NewsSerializer
-    permission_classes = [ReadOnlyForEveryone]
+    permission_classes = [ContentPermission]
 
     def get_queryset(self):
-        return News.objects.filter(is_published=True).select_related('author').order_by('-created_at')
+        qs = News.objects.select_related('author').order_by('-created_at')
+        user = self.request.user
+
+        # Админ и модератор видят всё, включая черновики
+        if user.is_authenticated and (user.is_admin() or user.is_moderator()):
+            return qs
+        # Автор видит свои черновики — иначе он не найдёт то, что только что создал
+        if user.is_authenticated:
+            return qs.filter(Q(is_published=True) | Q(author=user))
+        return qs.filter(is_published=True)
+
+    def perform_create(self, serializer):
+        # Автора берём из запроса, а не из тела — иначе можно подписаться чужим именем
+        serializer.save(author=self.request.user)
