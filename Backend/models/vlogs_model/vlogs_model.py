@@ -14,6 +14,18 @@ class Vlogs(TimeManager):
         User, on_delete=models.SET_NULL,
         null=True, blank=True, verbose_name='Автор',
     )
+    KIND_CHOICES = [
+        ('devlog', 'Девлог'),
+        ('tutorial', 'Туториал'),
+        ('review', 'Обзор'),
+        ('stream', 'Стрим'),
+        ('other', 'Разное'),
+    ]
+
+    kind = models.CharField(
+        'Раздел', max_length=20, choices=KIND_CHOICES, default='devlog',
+        help_text='Показывается плашкой на карточке и даёт фильтр в списке влогов.',
+    )
     vlog_title = models.CharField('Заголовок (RU)', max_length=500)
     vlog_title_en = models.CharField('Заголовок (EN)', max_length=500, blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
     text = models.TextField('Описание (RU)', blank=True, default='')

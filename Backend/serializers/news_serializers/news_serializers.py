@@ -11,11 +11,13 @@ class NewsSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
     # Картинка или видео до 50 МБ; исполняемые форматы отсекаются
     media = serializers.FileField(required=False, validators=[validate_media_file])
+    kind_display = serializers.CharField(source='get_kind_display', read_only=True)
 
     class Meta:
         model = News
         fields = [
-            'id', 'title', 'title_en', 'content', 'content_en', 'url', 'media',
+            'id', 'kind', 'kind_display',
+            'title', 'title_en', 'content', 'content_en', 'url', 'media',
             'author', 'is_published', 'slug', 'created_at',
         ]
         read_only_fields = ['id', 'author', 'created_at']

@@ -21,11 +21,19 @@ class NewsViewSet(viewsets.ModelViewSet):
 
         # Админ и модератор видят всё, включая черновики
         if user.is_authenticated and (user.is_admin() or user.is_moderator()):
-            return qs
+            return self._by_kind(qs)
         # Автор видит свои черновики — иначе он не найдёт то, что только что создал
         if user.is_authenticated:
-            return qs.filter(Q(is_published=True) | Q(author=user))
-        return qs.filter(is_published=True)
+            qs = qs.filter(Q(is_published=True) | Q(author=user))
+        else:
+            qs = qs.filter(is_published=True)
+
+        return self._by_kind(qs)
+
+    def _by_kind(self, queryset):
+        """?kind=devlog и т.д. — фильтр списка по разделу."""
+        kind = self.request.query_params.get('kind')
+        return queryset.filter(kind=kind) if kind else queryset
 
     def perform_create(self, serializer):
         # Автора берём из запроса, а не из тела — иначе можно подписаться чужим именем

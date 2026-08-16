@@ -16,11 +16,13 @@ class VlogsSerializer(serializers.ModelSerializer):
     embed_url = serializers.URLField(source='url', required=False, allow_blank=True)
     author = serializers.StringRelatedField(read_only=True)
     media = serializers.FileField(required=False, validators=[validate_media_file])
+    kind_display = serializers.CharField(source='get_kind_display', read_only=True)
 
     class Meta:
         model = Vlogs
         fields = [
-            'id', 'title', 'title_en', 'description', 'description_en', 'embed_url', 'media',
+            'id', 'kind', 'kind_display',
+            'title', 'title_en', 'description', 'description_en', 'embed_url', 'media',
             'author', 'is_published', 'slug', 'created_at',
         ]
         read_only_fields = ['id', 'author', 'created_at']

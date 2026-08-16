@@ -25,6 +25,18 @@ class News(TimeManager):
     Адрес (slug) генерируется из заголовка сам, если его не задали.
     """
 
+    KIND_CHOICES = [
+        ('devlog', 'Девлог'),
+        ('release', 'Релиз'),
+        ('update', 'Обновление'),
+        ('announce', 'Анонс'),
+        ('other', 'Разное'),
+    ]
+
+    kind = models.CharField(
+        'Раздел', max_length=20, choices=KIND_CHOICES, default='devlog',
+        help_text='Показывается плашкой на карточке и даёт фильтр в списке новостей.',
+    )
     title = models.CharField('Заголовок (RU)', max_length=230)
     title_en = models.CharField('Заголовок (EN)', max_length=230, blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
     content = models.TextField('Текст (RU)', blank=True, default='')
