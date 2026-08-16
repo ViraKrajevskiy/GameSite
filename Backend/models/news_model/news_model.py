@@ -25,8 +25,10 @@ class News(TimeManager):
     Адрес (slug) генерируется из заголовка сам, если его не задали.
     """
 
-    title = models.CharField('Заголовок', max_length=230)
-    content = models.TextField('Текст', blank=True, default='')
+    title = models.CharField('Заголовок (RU)', max_length=230)
+    title_en = models.CharField('Заголовок (EN)', max_length=230, blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
+    content = models.TextField('Текст (RU)', blank=True, default='')
+    content_en = models.TextField('Текст (EN)', blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
     url = models.URLField('Ссылка', max_length=230, blank=True, default='')
     media = models.FileField(
         'Картинка или видео', upload_to='news/', blank=True, null=True,

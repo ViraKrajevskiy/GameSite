@@ -10,7 +10,9 @@ class VlogsSerializer(serializers.ModelSerializer):
     # Раньше все три были read_only, из-за чего влог физически нельзя было
     # создать через API: передавать было нечего.
     title = serializers.CharField(source='vlog_title')
+    title_en = serializers.CharField(source='vlog_title_en', required=False, allow_blank=True)
     description = serializers.CharField(source='text', required=False, allow_blank=True)
+    description_en = serializers.CharField(source='text_en', required=False, allow_blank=True)
     embed_url = serializers.URLField(source='url', required=False, allow_blank=True)
     author = serializers.StringRelatedField(read_only=True)
     media = serializers.FileField(required=False, validators=[validate_media_file])
@@ -18,7 +20,7 @@ class VlogsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vlogs
         fields = [
-            'id', 'title', 'description', 'embed_url', 'media',
+            'id', 'title', 'title_en', 'description', 'description_en', 'embed_url', 'media',
             'author', 'is_published', 'slug', 'created_at',
         ]
         read_only_fields = ['id', 'author', 'created_at']

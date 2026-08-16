@@ -14,8 +14,10 @@ class Vlogs(TimeManager):
         User, on_delete=models.SET_NULL,
         null=True, blank=True, verbose_name='Автор',
     )
-    vlog_title = models.CharField('Заголовок', max_length=500)
-    text = models.TextField('Описание', blank=True, default='')
+    vlog_title = models.CharField('Заголовок (RU)', max_length=500)
+    vlog_title_en = models.CharField('Заголовок (EN)', max_length=500, blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
+    text = models.TextField('Описание (RU)', blank=True, default='')
+    text_en = models.TextField('Описание (EN)', blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
 
     url = models.URLField(
         'Ссылка на видео', max_length=230, blank=True, default='',

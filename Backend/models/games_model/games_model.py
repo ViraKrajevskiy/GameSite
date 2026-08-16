@@ -13,12 +13,14 @@ class Games(TimeManager):
         ('other', 'Другое'),
     ]
 
-    title = models.CharField('Название', max_length=100)
+    title = models.CharField('Название (RU)', max_length=100)
+    title_en = models.CharField('Название (EN)', max_length=100, blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
     kind = models.CharField(
         'Тип продукта', max_length=20, choices=KIND_CHOICES, default='game',
         help_text='Показывается плашкой на карточке и даёт фильтр в каталоге.',
     )
-    description = models.TextField('Описание', blank=True, default='')
+    description = models.TextField('Описание (RU)', blank=True, default='')
+    description_en = models.TextField('Описание (EN)', blank=True, default='', help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.')
     image = models.ImageField(
         'Обложка', upload_to='images/', blank=True, null=True,
         help_text='Не обязательно. Без обложки карточка покажет узор с первой буквой названия.',

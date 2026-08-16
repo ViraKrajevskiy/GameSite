@@ -15,7 +15,7 @@ class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = [
-            'id', 'title', 'content', 'url', 'media',
+            'id', 'title', 'title_en', 'content', 'content_en', 'url', 'media',
             'author', 'is_published', 'slug', 'created_at',
         ]
         read_only_fields = ['id', 'author', 'created_at']
@@ -23,6 +23,9 @@ class NewsSerializer(serializers.ModelSerializer):
             # slug генерируем из заголовка, если не прислали
             'slug': {'required': False, 'allow_blank': True},
             'content': {'required': False, 'allow_blank': True},
+            # Английская версия не обязательна: где пусто — фронт покажет русский
+            'title_en': {'required': False, 'allow_blank': True},
+            'content_en': {'required': False, 'allow_blank': True},
             # Новость без файла — нормальный случай; иначе создать её
             # можно было бы только multipart-запросом с вложением.
             'media': {'required': False},

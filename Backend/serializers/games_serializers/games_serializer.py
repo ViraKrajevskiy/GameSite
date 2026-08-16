@@ -35,7 +35,8 @@ class GamesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Games
         fields = [
-            'id', 'title', 'kind', 'kind_display', 'description', 'image', 'url',
+            'id', 'title', 'title_en', 'kind', 'kind_display',
+            'description', 'description_en', 'image', 'url',
             'platforms', 'average_rating', 'ratings_count', 'created_at',
         ]
         read_only_fields = ['id', 'created_at']
@@ -44,6 +45,9 @@ class GamesSerializer(serializers.ModelSerializer):
             # создать игру можно было только multipart-запросом с файлом.
             'image': {'required': False},
             'url': {'required': False},
+            # Английская версия не обязательна: где пусто — фронт покажет русский
+            'title_en': {'required': False, 'allow_blank': True},
+            'description_en': {'required': False, 'allow_blank': True},
         }
 
     @extend_schema_field(GamePlatformSerializer(many=True))
