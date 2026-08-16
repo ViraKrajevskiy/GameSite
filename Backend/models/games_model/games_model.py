@@ -69,9 +69,11 @@ class Platform(TimeManager):
 
 class GamePlatformRelease(TimeManager):
     STATUS_CHOICES = [
-        ('released', 'Вышло'),
-        ('waiting', 'Скоро'),
         ('not_released', 'Не выпущено'),
+        ('in_dev', 'В разработке'),
+        ('beta', 'Бета'),
+        ('waiting', 'Скоро'),
+        ('released', 'Вышло'),
     ]
 
     game = models.ForeignKey(Games, on_delete=models.CASCADE, related_name='platform_releases')
