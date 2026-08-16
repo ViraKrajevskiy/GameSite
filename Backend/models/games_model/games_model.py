@@ -18,9 +18,12 @@ class Games(TimeManager):
         'Тип продукта', max_length=20, choices=KIND_CHOICES, default='game',
         help_text='Показывается плашкой на карточке и даёт фильтр в каталоге.',
     )
-    description = models.TextField('Описание')
-    image = models.ImageField('Обложка', upload_to='images/')
-    url = models.URLField('Основная ссылка', blank=True)
+    description = models.TextField('Описание', blank=True, default='')
+    image = models.ImageField(
+        'Обложка', upload_to='images/', blank=True, null=True,
+        help_text='Не обязательно. Без обложки карточка покажет узор с первой буквой названия.',
+    )
+    url = models.URLField('Основная ссылка', blank=True, default='')
     platforms = models.ManyToManyField('Platform', through='GamePlatformRelease', related_name='games')
 
     class Meta:
