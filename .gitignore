@@ -1,2 +1,26 @@
-# Project exclude paths
+# Виртуальное окружение
 /.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Секреты — критично, никогда не коммитить
+.env
+*.pem
+*.key
+
+# База и пользовательские файлы
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+
+# IDE
+.idea/
+.vscode/
+
+# Логи
+*.log

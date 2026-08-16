@@ -1,0 +1,34 @@
+[Unit]
+Description=GameSite Django API (gunicorn)
+After=network.target
+
+[Service]
+Type=notify
+User=ubuntu
+Group=www-data
+WorkingDirectory=/srv/gamesite
+EnvironmentFile=/srv/gamesite/.env
+# workers: 2 для сервера с 1 ГБ RAM, 3 — для 2 ГБ и больше.
+# Формула: (2 x ядра) + 1, но упирается в память — каждый воркер ест ~80-120 МБ.
+ExecStart=/srv/gamesite/.venv/bin/gunicorn \
+    --workers 2 \
+    --max-requests 500 \
+    --max-requests-jitter 50 \
+    --bind unix:/run/gamesite/gunicorn.sock \
+    --access-logfile - \
+    --error-logfile - \
+    Config.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+RuntimeDirectory=gamesite
+RuntimeDirectoryMode=0755
+KillMode=mixed
+TimeoutStopSec=5
+Restart=always
+RestartSec=3
+
+# Немного изоляции
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
