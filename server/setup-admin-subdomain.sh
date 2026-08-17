@@ -223,11 +223,16 @@ if ! nginx -t 2>/tmp/nginx-test.log; then
     cat /tmp/nginx-test.log >&2
     cp "$BACKUP_DIR/gamesite.conf" "$SITE_CONF"
     rm -f /etc/nginx/sites-enabled/gamesite-admin
-    nginx -t >/dev/null 2>&1 && systemctl reload nginx
+    nginx -t >/dev/null 2>&1 && systemctl restart nginx
     die "nginx не принял конфиг — всё откатил, сайт работает как раньше. Лог выше."
 fi
-systemctl reload nginx
-ok "nginx перезагружен"
+# Именно restart, а не reload. На боевом сервере reload возвращал успех,
+# но конфиг не перечитывал: правка Referrer-Policy применилась только после
+# полного перезапуска. Простой — доли секунды, а поведение предсказуемое.
+systemctl restart nginx
+sleep 1
+systemctl is-active --quiet nginx || die "nginx не поднялся: sudo journalctl -u nginx -n 30 --no-pager"
+ok "nginx перезапущен"
 
 
 # --- 5. Сертификат ----------------------------------------------------------
@@ -347,6 +352,6 @@ else
     echo "    sudo cp $BACKUP_DIR/gamesite.conf $SITE_CONF"
     echo "    sudo cp $BACKUP_DIR/env $ENV_FILE"
     echo "    sudo rm -f /etc/nginx/sites-enabled/gamesite-admin"
-    echo "    sudo nginx -t && sudo systemctl reload nginx && sudo systemctl restart gamesite"
+    echo "    sudo nginx -t && sudo systemctl restart nginx && sudo systemctl restart gamesite"
 fi
 echo

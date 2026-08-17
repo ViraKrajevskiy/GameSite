@@ -98,13 +98,17 @@ location = /admin {
 
 ### 4. Поднять поддомен
 
+> Везде `restart`, а не `reload`. На боевом сервере `reload` возвращал успех,
+> но конфиг не перечитывал — правка применилась только после полного
+> перезапуска. Простой измеряется долями секунды.
+
 ```bash
 sudo cp /srv/gamesite/server/nginx-gamesite-admin.conf \
         /etc/nginx/sites-available/gamesite-admin
 sudo sed -i 's/admin\.gamesite\.duckdns\.org/admin.virakrajevskiy.duckdns.org/' \
         /etc/nginx/sites-available/gamesite-admin
 sudo ln -s /etc/nginx/sites-available/gamesite-admin /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
+sudo nginx -t && sudo systemctl restart nginx
 ```
 
 `nginx -t` обязателен. Если ругается на `duplicate upstream` — значит
@@ -185,7 +189,7 @@ curl -s -o /dev/null -w "admin /api/ → %{http_code}\n" \
 
 **Заблокировал сам себя `allow/deny`** — правило снимается только с сервера:
 `sudo nano /etc/nginx/sites-available/gamesite-admin`, закомментировать строки,
-`sudo systemctl reload nginx`.
+`sudo systemctl restart nginx`.
 
 **404 на самом поддомене после входа** — проверь `DJANGO_ADMIN_HOST` в `.env`:
 если там опечатка, middleware не узнаёт свой хост и режет всё подряд.
@@ -197,5 +201,5 @@ curl -s -o /dev/null -w "admin /api/ → %{http_code}\n" \
 sudo rm /etc/nginx/sites-enabled/gamesite-admin
 # в /etc/nginx/sites-available/gamesite вернуть proxy_pass вместо return 404
 # в /srv/gamesite/.env убрать строку DJANGO_ADMIN_HOST
-sudo nginx -t && sudo systemctl reload nginx && sudo systemctl restart gamesite
+sudo nginx -t && sudo systemctl restart nginx && sudo systemctl restart gamesite
 ```
