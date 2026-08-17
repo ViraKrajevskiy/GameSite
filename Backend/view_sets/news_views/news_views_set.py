@@ -16,7 +16,7 @@ class NewsViewSet(viewsets.ModelViewSet):
     permission_classes = [ContentPermission]
 
     def get_queryset(self):
-        qs = News.objects.select_related('author').order_by('-created_at')
+        qs = News.objects.select_related('author').prefetch_related('links').order_by('-created_at')
         user = self.request.user
 
         # Админ и модератор видят всё, включая черновики

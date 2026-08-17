@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from Backend.models.base_user_model.base_model import User
@@ -8,6 +9,7 @@ from Backend.models.vlogs_model.vlogs_model import Vlogs
 from Backend.models.comments_model.vlogs_coment import VlogsComment
 from Backend.models.games_model.games_model import Games, Platform, GamePlatformRelease, GameVersion
 from Backend.models.games_model.game_rating_models import GamesRating
+from Backend.models.links_model.links_model import ContentLink
 from Backend.models.home_model.home_model import HomeHero, HeroStat
 from Backend.models.resume_model.resume_model import (
     Resume, ResumeContact, ResumeFact, ResumeSkillGroup, ResumeExperience,
@@ -38,6 +40,18 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
 
+class ContentLinkInline(GenericTabularInline):
+    """
+    Ссылки к материалу. Один инлайн на новости, влоги и продукты —
+    generic-связь позволяет не плодить три одинаковых.
+    """
+    model = ContentLink
+    extra = 1
+    fields = ['url', 'title', 'title_en', 'kind', 'order']
+    verbose_name = 'Ссылка'
+    verbose_name_plural = 'Ссылки'
+
+
 class GamePlatformReleaseInline(admin.TabularInline):
     model = GamePlatformRelease
     extra = 1
@@ -60,7 +74,7 @@ class GamesAdmin(admin.ModelAdmin):
     list_display = ['title', 'kind', 'latest_version', 'platform_list', 'created_at']
     list_filter = ['kind']
     search_fields = ['title']
-    inlines = [GamePlatformReleaseInline, GameVersionInline]
+    inlines = [GamePlatformReleaseInline, GameVersionInline, ContentLinkInline]
     # Английские поля раньше сюда не попали — из-за этого двуязычие
     # существовало в модели, но завести перевод через админку было нельзя
     fields = ['title', 'title_en', 'kind', 'description', 'description_en', 'image', 'url']
@@ -115,10 +129,11 @@ class GamesRatingAdmin(admin.ModelAdmin):
 
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'is_published', 'created_at']
-    list_filter = ['is_published']
+    list_display = ['title', 'kind', 'author', 'is_published', 'created_at']
+    list_filter = ['is_published', 'kind']
     search_fields = ['title', 'author__username']
     prepopulated_fields = {'slug': ('title',)}
+    inlines = [ContentLinkInline]
 
 
 @admin.register(NewsComment)
@@ -130,10 +145,11 @@ class NewsCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Vlogs)
 class VlogsAdmin(admin.ModelAdmin):
-    list_display = ['vlog_title', 'author', 'is_published', 'created_at']
-    list_filter = ['is_published']
+    list_display = ['vlog_title', 'kind', 'author', 'is_published', 'created_at']
+    list_filter = ['is_published', 'kind']
     search_fields = ['vlog_title', 'author__username']
     prepopulated_fields = {'slug': ('vlog_title',)}
+    inlines = [ContentLinkInline]
 
 
 @admin.register(VlogsComment)

@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from Backend.models.games_model.games_model import Games, GameVersion
 from Backend.validators.file_validators.file_validators import validate_image_file
+from Backend.serializers.links_serializers.links_serializer import ContentLinkSerializer
 
 
 class GamePlatformSerializer(serializers.Serializer):
@@ -37,6 +38,7 @@ class GamesSerializer(serializers.ModelSerializer):
     platforms = serializers.SerializerMethodField()
     versions = GameVersionSerializer(many=True, read_only=True)
     latest_version = serializers.SerializerMethodField()
+    links = ContentLinkSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
     ratings_count = serializers.SerializerMethodField()
     # Обложка: только картинка до 5 МБ
@@ -47,7 +49,7 @@ class GamesSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'title_en', 'kind', 'kind_display',
             'description', 'description_en', 'image', 'url',
-            'platforms', 'versions', 'latest_version',
+            'platforms', 'versions', 'latest_version', 'links',
             'average_rating', 'ratings_count', 'created_at',
         ]
         read_only_fields = ['id', 'created_at']

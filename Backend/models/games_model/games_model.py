@@ -1,5 +1,7 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from Backend.models.base_user_model.base_model import TimeManager
+from Backend.models.links_model.links_model import ContentLink
 
 
 class Games(TimeManager):
@@ -27,6 +29,10 @@ class Games(TimeManager):
     )
     url = models.URLField('Основная ссылка', blank=True, default='')
     platforms = models.ManyToManyField('Platform', through='GamePlatformRelease', related_name='games')
+
+    # Прикреплённые ссылки. GenericRelation колонку не создаёт —
+    # нужна, чтобы связь читалась одним prefetch_related, без N+1.
+    links = GenericRelation(ContentLink, related_query_name='games')
 
     class Meta:
         verbose_name = 'Продукт'

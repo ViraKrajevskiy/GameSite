@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from Backend.models.vlogs_model.vlogs_model import Vlogs
 from Backend.validators.file_validators.file_validators import validate_media_file
+from Backend.serializers.links_serializers.links_serializer import ContentLinkSerializer
 
 
 class VlogsSerializer(serializers.ModelSerializer):
@@ -17,13 +18,14 @@ class VlogsSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
     media = serializers.FileField(required=False, validators=[validate_media_file])
     kind_display = serializers.CharField(source='get_kind_display', read_only=True)
+    links = ContentLinkSerializer(many=True, read_only=True)
 
     class Meta:
         model = Vlogs
         fields = [
             'id', 'kind', 'kind_display',
             'title', 'title_en', 'description', 'description_en', 'embed_url', 'media',
-            'author', 'is_published', 'slug', 'created_at',
+            'author', 'is_published', 'slug', 'links', 'created_at',
         ]
         read_only_fields = ['id', 'author', 'created_at']
         extra_kwargs = {

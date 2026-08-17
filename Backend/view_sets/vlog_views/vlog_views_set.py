@@ -14,7 +14,7 @@ class VlogsViewSet(viewsets.ModelViewSet):
     permission_classes = [ContentPermission]
 
     def get_queryset(self):
-        qs = Vlogs.objects.select_related('author').order_by('-created_at')
+        qs = Vlogs.objects.select_related('author').prefetch_related('links').order_by('-created_at')
         user = self.request.user
 
         if user.is_authenticated and (user.is_admin() or user.is_moderator()):

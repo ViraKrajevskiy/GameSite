@@ -1,7 +1,9 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.text import slugify
 
-from Backend.models.base_user_model.base_model import TimeManager, User
+from Backend.models.base_user_model.base_model import TimeManager
+from Backend.models.links_model.links_model import ContentLink, User
 
 
 def unique_slug(model, title, instance=None):
@@ -56,6 +58,10 @@ class News(TimeManager):
         'Адрес', max_length=255, unique=True, blank=True,
         help_text='Можно не заполнять — соберётся из заголовка.',
     )
+
+    # Прикреплённые ссылки. GenericRelation колонку не создаёт —
+    # нужна, чтобы связь читалась одним prefetch_related, без N+1.
+    links = GenericRelation(ContentLink, related_query_name='news')
 
     class Meta:
         verbose_name = 'Новость'

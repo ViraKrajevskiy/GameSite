@@ -26,7 +26,7 @@ class GamesViewSet(viewsets.ModelViewSet):
         queryset = (
             Games.objects
             .all()
-            .prefetch_related('platform_releases__platform', 'versions')
+            .prefetch_related('platform_releases__platform', 'versions', 'links')
             .annotate(avg_rating=Avg('ratings__rating'), ratings_count=Count('ratings', distinct=True))
             .order_by('-created_at')
         )
