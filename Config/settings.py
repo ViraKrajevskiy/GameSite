@@ -73,6 +73,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Админка только со своего хоста (DJANGO_ADMIN_HOST). Дубль защиты
+    # на случай, если конфиг nginx когда-нибудь затрут.
+    'Backend.middleware.admin_host.AdminHostMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
