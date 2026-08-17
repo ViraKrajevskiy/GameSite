@@ -6,7 +6,7 @@ from Backend.models.news_model.news_model import News
 from Backend.models.comments_model.news_coment import NewsComment
 from Backend.models.vlogs_model.vlogs_model import Vlogs
 from Backend.models.comments_model.vlogs_coment import VlogsComment
-from Backend.models.games_model.games_model import Games, Platform, GamePlatformRelease
+from Backend.models.games_model.games_model import Games, Platform, GamePlatformRelease, GameVersion
 from Backend.models.games_model.game_rating_models import GamesRating
 from Backend.models.home_model.home_model import HomeHero, HeroStat
 from Backend.models.resume_model.resume_model import (
@@ -47,13 +47,28 @@ class GamePlatformReleaseInline(admin.TabularInline):
     verbose_name_plural = 'На каких платформах доступно'
 
 
+class GameVersionInline(admin.TabularInline):
+    model = GameVersion
+    extra = 1
+    fields = ['number', 'released_at', 'changelog', 'changelog_en', 'url']
+    verbose_name = 'Версия'
+    verbose_name_plural = 'История версий'
+
+
 @admin.register(Games)
 class GamesAdmin(admin.ModelAdmin):
-    list_display = ['title', 'kind', 'platform_list', 'created_at']
+    list_display = ['title', 'kind', 'latest_version', 'platform_list', 'created_at']
     list_filter = ['kind']
     search_fields = ['title']
-    inlines = [GamePlatformReleaseInline]
-    fields = ['title', 'kind', 'description', 'image', 'url']
+    inlines = [GamePlatformReleaseInline, GameVersionInline]
+    # Английские поля раньше сюда не попали — из-за этого двуязычие
+    # существовало в модели, но завести перевод через админку было нельзя
+    fields = ['title', 'title_en', 'kind', 'description', 'description_en', 'image', 'url']
+
+    @admin.display(description='Версия')
+    def latest_version(self, obj):
+        version = next(iter(obj.versions.all()[:1]), None)
+        return version.number if version else '—'
 
     @admin.display(description='Платформы')
     def platform_list(self, obj):
@@ -61,7 +76,9 @@ class GamesAdmin(admin.ModelAdmin):
         return ', '.join(titles) if titles else '—'
 
     def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related('platform_releases__platform')
+        return super().get_queryset(request).prefetch_related(
+            'platform_releases__platform', 'versions',
+        )
 
 
 @admin.register(Platform)
@@ -79,6 +96,14 @@ class GamePlatformReleaseAdmin(admin.ModelAdmin):
     list_filter = ['status', 'platform']
     search_fields = ['game__title', 'platform__title']
     autocomplete_fields = ['game', 'platform']
+
+
+@admin.register(GameVersion)
+class GameVersionAdmin(admin.ModelAdmin):
+    list_display = ['game', 'number', 'released_at']
+    list_filter = ['game']
+    search_fields = ['game__title', 'number']
+    autocomplete_fields = ['game']
 
 
 @admin.register(GamesRating)

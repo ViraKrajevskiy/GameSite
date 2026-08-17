@@ -91,3 +91,46 @@ class GamePlatformRelease(TimeManager):
 
     def __str__(self):
         return f'{self.game.title} — {self.platform.title} ({self.status})'
+
+class GameVersion(TimeManager):
+    """
+    Одна выпущенная версия продукта.
+
+    GamePlatformRelease отвечает на вопрос «где это доступно», а здесь —
+    «что изменилось и когда». Раньше историю обновлений приходилось писать
+    новостями, и по карточке продукта было не понять, какая версия свежая.
+    """
+
+    game = models.ForeignKey(Games, on_delete=models.CASCADE, related_name='versions')
+    number = models.CharField(
+        'Версия', max_length=30,
+        help_text='Как пишешь сам: 1.0, 1.2.3, v2 beta — что угодно.',
+    )
+    released_at = models.DateField(
+        'Дата выхода', null=True, blank=True,
+        help_text='Не обязательно. Без даты версия встанет в конец списка.',
+    )
+    changelog = models.TextField(
+        'Что нового (RU)', blank=True, default='',
+        help_text='Не обязательно. Каждый пункт с новой строки.',
+    )
+    changelog_en = models.TextField(
+        'Что нового (EN)', blank=True, default='',
+        help_text='Не обязательно. Если пусто — на английской версии покажется русский текст.',
+    )
+    url = models.URLField(
+        'Ссылка на скачивание', blank=True, default='',
+        help_text='Не обязательно. Ссылка именно на эту версию, если она своя.',
+    )
+
+    class Meta:
+        # Одна и та же версия продукта дважды — почти всегда опечатка
+        unique_together = ('game', 'number')
+        # nulls_last задан явно: SQLite и PostgreSQL кладут NULL при DESC
+        # в разные концы, а версия без даты не должна притворяться свежей
+        ordering = [models.F('released_at').desc(nulls_last=True), '-id']
+        verbose_name = 'Версия продукта'
+        verbose_name_plural = 'Версии продукта'
+
+    def __str__(self):
+        return f'{self.game.title} {self.number}'

@@ -2,7 +2,7 @@ from django.db.models import Avg
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
-from Backend.models.games_model.games_model import Games
+from Backend.models.games_model.games_model import Games, GameVersion
 from Backend.validators.file_validators.file_validators import validate_image_file
 
 
@@ -24,9 +24,19 @@ class GamePlatformSerializer(serializers.Serializer):
     release_date = serializers.DateField(allow_null=True)
 
 
+class GameVersionSerializer(serializers.ModelSerializer):
+    """История обновлений продукта. Только чтение: версии заводятся в админке."""
+
+    class Meta:
+        model = GameVersion
+        fields = ['id', 'number', 'released_at', 'changelog', 'changelog_en', 'url']
+
+
 class GamesSerializer(serializers.ModelSerializer):
     kind_display = serializers.CharField(source='get_kind_display', read_only=True)
     platforms = serializers.SerializerMethodField()
+    versions = GameVersionSerializer(many=True, read_only=True)
+    latest_version = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
     ratings_count = serializers.SerializerMethodField()
     # Обложка: только картинка до 5 МБ
@@ -37,7 +47,8 @@ class GamesSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'title_en', 'kind', 'kind_display',
             'description', 'description_en', 'image', 'url',
-            'platforms', 'average_rating', 'ratings_count', 'created_at',
+            'platforms', 'versions', 'latest_version',
+            'average_rating', 'ratings_count', 'created_at',
         ]
         read_only_fields = ['id', 'created_at']
         extra_kwargs = {
@@ -94,3 +105,16 @@ class GamesSerializer(serializers.ModelSerializer):
         if count is None:
             count = obj.ratings.count()
         return count
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_latest_version(self, obj):
+        """
+        Номер свежей версии — чтобы карточка показала плашку «v1.2»,
+        не разбирая на фронте весь список.
+
+        Порядок задан в Meta.ordering модели, первый элемент и есть свежий.
+        Обращаемся через срез списка, а не .first(): queryset уже
+        прогружен prefetch_related, лишний запрос в базу не нужен.
+        """
+        versions = list(obj.versions.all()[:1])
+        return versions[0].number if versions else None
