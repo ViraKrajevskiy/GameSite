@@ -201,6 +201,15 @@ ok "публичный домен обработан"
 say "4/7  Поднимаю $ADMIN_DOMAIN"
 if [ -f "$ADMIN_CONF" ] && grep -q "server_name $ADMIN_DOMAIN" "$ADMIN_CONF"; then
     skip "конфиг уже на месте — не перезаписываю (в нём может быть SSL от certbot)"
+
+    # Точечные починки для конфигов, поставленных ранними версиями скрипта.
+    # Целиком файл не трогаем: в нём уже лежит SSL-блок от certbot.
+    if grep -q 'Referrer-Policy "no-referrer"' "$ADMIN_CONF"; then
+        # no-referrer заставляет браузер слать Origin: null даже на свой домен,
+        # и вход в админку падает с "Origin checking failed - null"
+        sed -i 's/Referrer-Policy "no-referrer"/Referrer-Policy "same-origin"/' "$ADMIN_CONF"
+        ok "починил Referrer-Policy: no-referrer -> same-origin (ломал вход в админку)"
+    fi
 else
     cp "$ADMIN_SRC" "$ADMIN_CONF"
     sed -i "s/admin\.gamesite\.duckdns\.org/${ADMIN_DOMAIN}/g" "$ADMIN_CONF"
