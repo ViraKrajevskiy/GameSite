@@ -26,6 +26,39 @@ ok()   { printf '    \033[32mok\033[0m %s\n' "$*"; }
 skip() { printf '    -- %s\n' "$*"; }
 die()  { printf '\n\033[31mОШИБКА:\033[0m %s\n\n' "$*" >&2; exit 1; }
 
+# По утрам unattended-upgrades держит блокировку dpkg, и apt-get падает.
+# Ждём её, а не валимся: скрипт запускают один раз, и упасть на установке
+# пакета — самый обидный вариант.
+apt_retry() {
+    local waited=0
+    while true; do
+        if DEBIAN_FRONTEND=noninteractive apt-get "$@" >/tmp/apt-admin.log 2>&1; then
+            [ "$waited" -gt 0 ] && echo
+            return 0
+        fi
+        if ! grep -qi "could not get lock\|unable to acquire" /tmp/apt-admin.log; then
+            [ "$waited" -gt 0 ] && echo
+            cat /tmp/apt-admin.log >&2
+            return 1
+        fi
+        if [ "$waited" -ge 300 ]; then
+            echo
+            return 1
+        fi
+        [ "$waited" -eq 0 ] && printf '    apt занят автообновлениями, жду'
+        printf '.'
+        sleep 10
+        waited=$((waited + 10))
+    done
+}
+
+# Всё, что успели набрать вслепую, пока шла установка, — выбросить.
+# Иначе случайная строка уедет в приглашение пароля.
+flush_stdin() {
+    [ -t 0 ] || return 0
+    read -r -t 0.5 -N 4096 _discard 2>/dev/null || true
+}
+
 [ "$(id -u)" -eq 0 ] || die "Запусти через sudo: sudo bash $0"
 [ -f "$SITE_CONF" ]  || die "Не нашёл $SITE_CONF — конфиг сайта называется иначе?"
 [ -f "$ADMIN_SRC" ]  || die "Не нашёл $ADMIN_SRC — сначала выкати код: cd /srv/gamesite && ./deploy.sh back"
@@ -63,9 +96,26 @@ say "2/7  Пароль для nginx"
 if [ -f "$HTPASSWD" ] && grep -q "^${ADMIN_USER}:" "$HTPASSWD"; then
     skip "пароль для '$ADMIN_USER' уже заведён (сменить: sudo htpasswd $HTPASSWD $ADMIN_USER)"
 else
-    command -v htpasswd >/dev/null || { apt-get update -qq && apt-get install -y -qq apache2-utils; }
-    echo "    Придумай пароль. Это НЕ пароль от Django — отдельный, специально другой."
-    echo "    Сохрани его в менеджере паролей: восстановить нельзя, только перезаписать."
+    if ! command -v htpasswd >/dev/null; then
+        echo "    ставлю apache2-utils — в нём htpasswd"
+        apt_retry update -qq || true
+        apt_retry install -y -qq apache2-utils \
+            || die "не смог поставить apache2-utils.
+  Поставь сам, потом запусти скрипт снова:
+      sudo apt-get install -y apache2-utils"
+        command -v htpasswd >/dev/null || die "apache2-utils поставился, а htpasswd не появился"
+        ok "apache2-utils готов"
+    fi
+
+    flush_stdin
+    echo
+    echo "    ------------------------------------------------------------"
+    echo "    СЕЙЧАС СПРОСИТ ПАРОЛЬ — до этой строки ничего не набирай."
+    echo
+    echo "    Это НЕ пароль от Django, придумай отдельный."
+    echo "    При вводе он не отображается — это нормально, печатай вслепую."
+    echo "    Восстановить его нельзя, только перезаписать: сохрани сразу."
+    echo "    ------------------------------------------------------------"
     echo
     if [ -f "$HTPASSWD" ]; then
         htpasswd "$HTPASSWD" "$ADMIN_USER"
