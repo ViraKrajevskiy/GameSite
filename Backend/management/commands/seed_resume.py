@@ -18,8 +18,8 @@ from Backend.models.resume_model.resume_model import (
 )
 
 RESUME = {
-    'name_ru': 'Кабулов Камолиддин',
-    'name_en': 'Kamoliddin Kabulov',
+    'name_ru': 'Vira Krajevskiy',
+    'name_en': 'Vira Krajevskiy',
     'role_ru': 'Fullstack-разработчик · Python / Django · Unity',
     'role_en': 'Fullstack Developer · Python / Django · Unity',
     'tagline_ru': 'Делаю бэкенды на Python/Django и игры на Unity. Этот сайт — мой каталог игр и портфолио одновременно.',
@@ -54,7 +54,6 @@ RESUME = {
 
 CONTACTS = [
     ('Telegram', 'Telegram', '@Vira_Krajevskiy', 'https://t.me/Vira_Krajevskiy'),
-    ('Телефон', 'Phone', '+998 (90) 036-80-52', 'tel:+998900368052'),
     ('Email', 'Email', 'guidevirgate@gmail.com', 'mailto:guidevirgate@gmail.com'),
     ('GitHub', 'GitHub', 'ViraKrajevskiy', 'https://github.com/ViraKrajevskiy'),
     ('itch.io', 'itch.io', 'virakrajevskiy.itch.io', 'https://virakrajevskiy.itch.io'),
