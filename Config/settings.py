@@ -72,6 +72,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Самый первый — переписывает REMOTE_ADDR настоящим IP клиента
+    # (из X-Forwarded-For). Без этого django-ratelimit падает 500
+    # при работе через nginx+unix-socket.
+    'Backend.middleware.real_ip.RealIPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     # Админка только со своего хоста (DJANGO_ADMIN_HOST). Дубль защиты
     # на случай, если конфиг nginx когда-нибудь затрут.
