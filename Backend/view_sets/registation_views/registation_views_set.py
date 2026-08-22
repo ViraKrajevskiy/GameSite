@@ -26,7 +26,6 @@ from rest_framework.views import APIView
 
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
-from django.views.decorators.debug import sensitive_post_parameters
 
 from Backend.models import User, PendingRegistration
 from Backend.serializers.registration_serializers.registration_serializer import (
@@ -75,7 +74,6 @@ def _send_already_registered_email(email: str):
     msg.send(fail_silently=False)
 
 
-@method_decorator(sensitive_post_parameters('password'), name='dispatch')
 @method_decorator(ratelimit(key='ip', rate='5/10m', method='POST', block=True), name='dispatch')
 class RegistrationView(APIView):
     """POST /api/auth/register/"""
@@ -92,41 +90,43 @@ class RegistrationView(APIView):
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
 
-        # 1) Если такой пользователь уже есть — не создаём ничего, шлём
-        #    уведомление владельцу и отвечаем нейтрально.
-        if User.objects.filter(email__iexact=email).exists():
+        # Всё что дальше — обёрнуто в широкий try/except: пользователь никогда
+        # не должен увидеть 500 из-за проблем с SMTP, шаблонами и т.п.
+        # Ответ всегда одинаковый и нейтральный, а причина падает в лог.
+        try:
+            # 1) Если такой пользователь уже есть — не создаём ничего, шлём
+            #    уведомление владельцу и отвечаем нейтрально.
+            if User.objects.filter(email__iexact=email).exists():
+                try:
+                    _send_already_registered_email(email)
+                except Exception:
+                    log.exception('Failed to send already-registered notice to %s', email)
+                return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
+
+            # 2) Уникальность username проверяем отдельно — но снова не палим:
+            #    отвечаем тем же GENERIC_RESPONSE и ничего не создаём.
+            if User.objects.filter(username__iexact=username).exists():
+                return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
+
+            # 3) email свободен — переписываем/создаём pending и шлём подтверждение.
+            PendingRegistration.objects.filter(email__iexact=email).delete()
             try:
-                _send_already_registered_email(email)
+                pending = PendingRegistration.objects.create(
+                    email=email,
+                    username=username,
+                    password_hash=make_password(password),
+                )
+            except IntegrityError:
+                return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
+
+            try:
+                _send_confirm_email(pending)
             except Exception:
-                log.exception('Failed to send already-registered notice to %s', email)
-            return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
+                log.exception('Failed to send confirm email to %s', email)
 
-        # 2) Уникальность username проверяем отдельно — но снова не палим:
-        #    отвечаем тем же GENERIC_RESPONSE и ничего не создаём. Пользователь
-        #    подумает, что регистрация ушла, но письма не увидит и через 24 ч
-        #    попробует снова. Это компромисс, зато никто не сможет через
-        #    forma-ответ узнать, занят ли ник.
-        if User.objects.filter(username__iexact=username).exists():
-            return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
-
-        # 3) email свободен — переписываем/создаём pending и шлём подтверждение.
-        PendingRegistration.objects.filter(email__iexact=email).delete()
-        try:
-            pending = PendingRegistration.objects.create(
-                email=email,
-                username=username,
-                password_hash=make_password(password),
-            )
-        except IntegrityError:
-            # маловероятно — только если словили гонку с параллельным запросом
-            return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
-
-        try:
-            _send_confirm_email(pending)
         except Exception:
-            log.exception('Failed to send confirm email to %s', email)
-            # Не откатываем pending — пользователь может попробовать зарегиться
-            # ещё раз, старая запись просто пересоздастся.
+            # Что-то совсем неожиданное (например, БД лежит). Не палим детали.
+            log.exception('Unexpected error in RegistrationView for %s', email)
 
         return Response(GENERIC_RESPONSE, status=status.HTTP_200_OK)
 
