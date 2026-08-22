@@ -4,25 +4,37 @@ from Backend.permissions.moderator_permissions.moderator_permission import IsAdm
 
 class CommentPermission(permissions.BasePermission):
     """
-    Для NewsComment / VlogsComment.
+    Для NewsComment / VlogsComment / GamesComment.
     - Читать может любой (GET/HEAD/OPTIONS).
-    - Создавать (POST) может любой авторизованный пользователь.
-    - Редактировать/удалять ("банить") — только модератор или админ.
-      Автор своего комментария менять/удалять не может.
+    - Создавать (POST) — любой авторизованный пользователь.
+    - Редактировать (PATCH/PUT) свой комментарий — сам автор.
+      Модератору редактировать чужие смысла нет.
+    - Удалять (DELETE) — автор своего или модератор/админ любой (бан).
     """
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
-        if request.method == 'POST':
-            return bool(request.user and request.user.is_authenticated)
-        # PUT/PATCH/DELETE — дальше решает has_object_permission
         return bool(request.user and request.user.is_authenticated)
+
+    def _author(self, obj):
+        # У всех трёх моделей поле автора называется по-разному
+        for attr in ('comment_writer', 'vl_comment_author', 'games_comment_writer'):
+            author = getattr(obj, attr, None)
+            if author is not None:
+                return author
+        return None
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return IsAdminOrModerator.check(request.user)
+        author = self._author(obj)
+        if request.method in ('PUT', 'PATCH'):
+            # только сам автор может редактировать свой комментарий
+            return author == request.user
+        if request.method == 'DELETE':
+            return author == request.user or IsAdminOrModerator.check(request.user)
+        return False
 
 
 class RatingPermission(permissions.BasePermission):

@@ -6,7 +6,9 @@ from Backend.view_sets.password_reset_views.password_reset_views_set import (
     PasswordResetRequestView, PasswordResetConfirmView,
 )
 from Backend.view_sets.login_views.login_views_set import LoginView, RefreshTokenView, MeView, ChangePasswordView
-from Backend.view_sets.comments_views.comment_views_set import NewsCommentViewSet, VlogsCommentViewSet
+from Backend.view_sets.comments_views.comment_views_set import (
+    NewsCommentViewSet, VlogsCommentViewSet, GamesCommentViewSet,
+)
 from Backend.view_sets.game_views_set.game_rating_views_set import GamesRatingViewSet
 from Backend.view_sets.news_views.news_views_set import NewsViewSet
 from Backend.views import home
@@ -18,6 +20,7 @@ from Backend.view_sets.home_views.home_views_set import HomeHeroView
 router = DefaultRouter()
 router.register(r'news-comments', NewsCommentViewSet, basename='news-comments')
 router.register(r'vlogs-comments', VlogsCommentViewSet, basename='vlogs-comments')
+router.register(r'games-comments', GamesCommentViewSet, basename='games-comments')
 router.register(r'game-ratings', GamesRatingViewSet, basename='game-ratings')
 router.register(r'games', GamesViewSet, basename='games')
 router.register(r'news', NewsViewSet, basename='news')

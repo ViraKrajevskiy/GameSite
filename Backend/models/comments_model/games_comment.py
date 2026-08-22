@@ -5,6 +5,12 @@ class GamesComment(TimeManager):
     games_news = models.ForeignKey('Games', on_delete=models.CASCADE, related_name='games_comments')
     games_comment_writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_user')
     games_text = models.CharField(max_length=400)
+    parent = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies',
+    )
+
+    class Meta:
+        ordering = ['created_at']
 
     def __str__(self):
         return f"{self.games_comment_writer}: {self.games_text[:50]} {self.created_at}"
