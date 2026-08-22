@@ -15,7 +15,6 @@ POST /api/auth/register/confirm/
 import logging
 
 from django.contrib.auth.hashers import make_password
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.db import IntegrityError
@@ -32,6 +31,7 @@ from Backend.serializers.registration_serializers.registration_serializer import
     RegistrationRequestSerializer,
     RegistrationConfirmSerializer,
 )
+from Backend.utils.email_brevo import send_email_via_brevo
 
 log = logging.getLogger(__name__)
 
@@ -53,25 +53,23 @@ def _send_confirm_email(pending: PendingRegistration):
         'confirm_url': confirm_url,
         'site_name': SITE_NAME,
     }
-    subject = f'Подтверждение регистрации на {SITE_NAME}'
-    body_txt = render_to_string('emails/registration_confirm.txt', ctx)
-    body_html = render_to_string('emails/registration_confirm.html', ctx)
-
-    msg = EmailMultiAlternatives(subject, body_txt, settings.DEFAULT_FROM_EMAIL, [pending.email])
-    msg.attach_alternative(body_html, 'text/html')
-    msg.send(fail_silently=False)
+    send_email_via_brevo(
+        to_email=pending.email,
+        subject=f'Подтверждение регистрации на {SITE_NAME}',
+        text=render_to_string('emails/registration_confirm.txt', ctx),
+        html=render_to_string('emails/registration_confirm.html', ctx),
+    )
 
 
 def _send_already_registered_email(email: str):
     login_url = f'{settings.FRONTEND_URL.rstrip("/")}/login'
     ctx = {'login_url': login_url, 'site_name': SITE_NAME}
-    subject = f'На ваш email пытались зарегистрироваться — {SITE_NAME}'
-    body_txt = render_to_string('emails/registration_already_exists.txt', ctx)
-    body_html = render_to_string('emails/registration_already_exists.html', ctx)
-
-    msg = EmailMultiAlternatives(subject, body_txt, settings.DEFAULT_FROM_EMAIL, [email])
-    msg.attach_alternative(body_html, 'text/html')
-    msg.send(fail_silently=False)
+    send_email_via_brevo(
+        to_email=email,
+        subject=f'На ваш email пытались зарегистрироваться — {SITE_NAME}',
+        text=render_to_string('emails/registration_already_exists.txt', ctx),
+        html=render_to_string('emails/registration_already_exists.html', ctx),
+    )
 
 
 @method_decorator(ratelimit(key='ip', rate='5/10m', method='POST', block=True), name='dispatch')
