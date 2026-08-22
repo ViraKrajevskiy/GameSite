@@ -2,7 +2,10 @@
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from Backend.view_sets.registation_views.registation_views_set import RegistrationView, RegistrationConfirmView
-from Backend.view_sets.login_views.login_views_set import LoginView, RefreshTokenView, MeView
+from Backend.view_sets.password_reset_views.password_reset_views_set import (
+    PasswordResetRequestView, PasswordResetConfirmView,
+)
+from Backend.view_sets.login_views.login_views_set import LoginView, RefreshTokenView, MeView, ChangePasswordView
 from Backend.view_sets.comments_views.comment_views_set import NewsCommentViewSet, VlogsCommentViewSet
 from Backend.view_sets.game_views_set.game_rating_views_set import GamesRatingViewSet
 from Backend.view_sets.news_views.news_views_set import NewsViewSet
@@ -28,9 +31,12 @@ urlpatterns = [
 
     path('api/auth/register/', RegistrationView.as_view(), name='register'),
     path('api/auth/register/confirm/', RegistrationConfirmView.as_view(), name='register-confirm'),
+    path('api/auth/password/reset/', PasswordResetRequestView.as_view(), name='password-reset'),
+    path('api/auth/password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
     path('api/auth/login/', LoginView.as_view(), name='login'),
     path('api/auth/login/refresh/', RefreshTokenView.as_view(), name='login-refresh'),
     path('api/auth/me/', MeView.as_view(), name='me'),
+    path('api/auth/password/change/', ChangePasswordView.as_view(), name='password-change'),
 
     path('api/hero/', HomeHeroView.as_view(), name='home-hero'),
     path('api/resume/', ResumeView.as_view(), name='resume'),
