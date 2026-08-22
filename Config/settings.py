@@ -226,3 +226,28 @@ LOGGING = {
         'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
     },
 }
+
+
+# --- Email / Brevo SMTP -----------------------------------------------------
+# Реальные ключи задаются в .env на проде. Если EMAIL_HOST не задан —
+# используем console-backend, тогда «письма» падают в stdout gunicorn'а
+# и разработка не требует настройки SMTP.
+
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', True)
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@localhost')
+
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# --- Публичный адрес фронта -------------------------------------------------
+# Нужен, чтобы вставлять полный URL в письма (ссылка подтверждения регистрации,
+# ссылка «войти», сброс пароля).
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://virakrajevskiy.duckdns.org')

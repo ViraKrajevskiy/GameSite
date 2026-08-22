@@ -1,7 +1,7 @@
 ﻿from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
-from Backend.view_sets.registation_views.registation_views_set import RegistrationView
+from Backend.view_sets.registation_views.registation_views_set import RegistrationView, RegistrationConfirmView
 from Backend.view_sets.login_views.login_views_set import LoginView, RefreshTokenView, MeView
 from Backend.view_sets.comments_views.comment_views_set import NewsCommentViewSet, VlogsCommentViewSet
 from Backend.view_sets.game_views_set.game_rating_views_set import GamesRatingViewSet
@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     path('api/auth/register/', RegistrationView.as_view(), name='register'),
+    path('api/auth/register/confirm/', RegistrationConfirmView.as_view(), name='register-confirm'),
     path('api/auth/login/', LoginView.as_view(), name='login'),
     path('api/auth/login/refresh/', RefreshTokenView.as_view(), name='login-refresh'),
     path('api/auth/me/', MeView.as_view(), name='me'),

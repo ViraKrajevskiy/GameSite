@@ -12,6 +12,7 @@ from Backend.models.resume_model.resume_model import (
     Resume, ResumeContact, ResumeFact, ResumeSkillGroup, ResumeExperience,
     ResumeProject, ResumeProjectLink, ResumeEducation, ResumeLanguage,
 )
+from Backend.models.pending_registration_model.pending_registration_model import PendingRegistration
 
 __all__ = [
     'User', 'TimeManager',
@@ -21,4 +22,5 @@ __all__ = [
     'HomeHero', 'HeroStat',
     'Resume', 'ResumeContact', 'ResumeFact', 'ResumeSkillGroup', 'ResumeExperience',
     'ResumeProject', 'ResumeProjectLink', 'ResumeEducation', 'ResumeLanguage',
+    'PendingRegistration',
 ]
